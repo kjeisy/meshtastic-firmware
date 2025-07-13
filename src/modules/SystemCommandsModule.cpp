@@ -105,12 +105,7 @@ int SystemCommandsModule::handleInputEvent(const InputEvent *event)
             IF_SCREEN(screen->showSimpleBanner("Node Info\nSent", 3000));
         }
         return true;
-    // No-screen device action
-    case INPUT_BROKER_NO_SCREEN_ACTION:
-        // Add your custom action here
-        // For example: send a specific canned message, toggle a feature, etc.
-        LOG_INFO("No-screen device action triggered");
-        return true;
+
     // Power control
     case INPUT_BROKER_SHUTDOWN:
         LOG_ERROR("Shutting Down");

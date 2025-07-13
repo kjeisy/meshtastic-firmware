@@ -332,6 +332,24 @@ int CannedMessageModule::handleInputEvent(const InputEvent *event)
             LaunchWithDestination(NODENUM_BROADCAST);
             return 1;
         }
+        // Special handling for USER_PRESS on no-screen devices: send a default canned message
+        if (event->inputEvent == INPUT_BROKER_USER_PRESS && !screen) {
+            // Try to send the first valid canned message (skip special entries)
+            if (messagesCount > 0) {
+                for (int i = 0; i < messagesCount; i++) {
+                    const char *message = getMessageByIndex(i);
+                    if (message && strcmp(message, "[Select Destination]") != 0 && 
+                        strcmp(message, "[Exit]") != 0 && 
+                        strcmp(message, "[-- Free Text --]") != 0) {
+                        sendText(NODENUM_BROADCAST, 0, message, false);
+                        return 1;
+                    }
+                }
+            }
+            // If no valid message found, send a simple status message
+            sendText(NODENUM_BROADCAST, 0, "Status: OK", false);
+            return 1;
+        }
         // Printable char (ASCII) opens free text compose
         if (event->kbchar >= 32 && event->kbchar <= 126) {
             runState = CANNED_MESSAGE_RUN_STATE_FREETEXT;
