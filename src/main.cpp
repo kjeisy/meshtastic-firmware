@@ -1055,11 +1055,11 @@ void setup()
             BaseType_t higherWake = 0;
             mainDelay.interruptFromISR(&higherWake);
         };
-        userConfigNoScreen.singlePress = INPUT_BROKER_USER_PRESS;
+        userConfigNoScreen.singlePress = INPUT_BROKER_SEND_PING;
         userConfigNoScreen.longPress = INPUT_BROKER_SHUTDOWN;
         userConfigNoScreen.longPressTime = 5000;
-        userConfigNoScreen.doublePress = INPUT_BROKER_SEND_PING;
-        userConfigNoScreen.triplePress = INPUT_BROKER_GPS_TOGGLE;
+        userConfigNoScreen.doublePress = INPUT_BROKER_GPS_TOGGLE;
+        userConfigNoScreen.triplePress = INPUT_BROKER_USER_PRESS;
         UserButtonThread->initButton(userConfigNoScreen);
     }
 #endif
