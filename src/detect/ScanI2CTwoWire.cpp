@@ -8,6 +8,7 @@
 #endif
 #if !defined(ARCH_PORTDUINO) && !defined(ARCH_STM32WL)
 #include "meshUtils.h" // vformat
+#include <Adafruit_SHT4x.h>
 #endif
 
 bool in_array(uint8_t *array, int size, uint8_t lookfor)
@@ -107,6 +108,15 @@ uint16_t ScanI2CTwoWire::getRegisterValue(const ScanI2CTwoWire::RegisterLocation
             i2cBus->read();
     }
     return value;
+}
+
+uint32_t ScanI2CTwoWire::getSHT4XSerial(ScanI2C::DeviceAddress addr) const
+{
+    Adafruit_SHT4x sht4x = Adafruit_SHT4x();
+    sht4x.begin(ScanI2CTwoWire::fetchI2CBus(addr));
+    uint32_t sht4xSerial = sht4x.readSerial();
+    LOG_DEBUG("SHT4x serial number: 0x%08x", sht4xSerial);
+    return sht4xSerial;
 }
 
 #define SCAN_SIMPLE_CASE(ADDR, T, ...)                                                                                           \
@@ -357,9 +367,9 @@ void ScanI2CTwoWire::scanPort(I2CPort port, uint8_t *address, uint8_t asize)
                 }
             case SHT31_4x_ADDR:     // same as OPT3001_ADDR_ALT
             case SHT31_4x_ADDR_ALT: // same as OPT3001_ADDR
-                registerValue = getRegisterValue(ScanI2CTwoWire::RegisterLocation(addr, 0x89), 2);
-                logRegisterValue(addr.address, 0x89, registerValue);
-                if (registerValue == 0x11a2 || registerValue == 0x11da || registerValue == 0xe9c || registerValue == 0xc8d || registerValue == 0xf28) {
+                // test if the register is a sht4x device by trying to read and validate the full serial number
+                // There is no other known way to discern between the device types without reading the full serial number
+                if (getSHT4XSerial(addr) != 0) {
                     type = SHT4X;
                     logFoundDevice("SHT4X", (uint8_t)addr.address);
                 } else if (getRegisterValue(ScanI2CTwoWire::RegisterLocation(addr, 0x7E), 2) == 0x5449) {
@@ -557,9 +567,5 @@ size_t ScanI2CTwoWire::countDevices() const
 void ScanI2CTwoWire::logFoundDevice(const char *device, uint8_t address)
 {
     LOG_INFO("%s found at address 0x%x", device, address);
-}
-void ScanI2CTwoWire::logRegisterValue(uint8_t address, uint8_t reg, uint16_t result)
-{
-    LOG_DEBUG("addr 0x%x: register 0x%x value: 0x%x", address, reg, result);
 }
 #endif
