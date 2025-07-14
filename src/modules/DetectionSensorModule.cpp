@@ -3,6 +3,7 @@
 #include "MeshService.h"
 #include "NodeDB.h"
 #include "PowerFSM.h"
+#include "SinglePortModule.h"
 #include "configuration.h"
 #include "main.h"
 #include <Throttle.h>
@@ -10,6 +11,27 @@ DetectionSensorModule *detectionSensorModule;
 
 #define GPIO_POLLING_INTERVAL 100
 #define DELAYED_INTERVAL 1000
+
+DetectionSensorModule::DetectionSensorModule()
+    : SinglePortModule("detection", meshtastic_PortNum_DETECTION_SENSOR_APP), OSThread("DetectionSensor")
+{
+#ifdef MESHTASTIC_EXCLUDE_SCREEN
+    if (inputBroker && moduleConfig.detection_sensor.enabled) {
+        this->inputObserver.observe(inputBroker);
+    }
+#endif
+}
+
+#ifdef MESHTASTIC_EXCLUDE_SCREEN
+int DetectionSensorModule::handleInputEvent(const InputEvent *event)
+{
+    if (event->inputEvent == INPUT_BROKER_USER_PRESS) {
+        sendDetectionMessage();
+        return 1;
+    }
+    return 0;
+}
+#endif
 
 typedef enum {
     DetectionSensorVerdictDetected,

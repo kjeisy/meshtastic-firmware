@@ -1,12 +1,14 @@
 #pragma once
 #include "SinglePortModule.h"
+#include "input/InputBroker.h"
 
 class DetectionSensorModule : public SinglePortModule, private concurrency::OSThread
 {
   public:
-    DetectionSensorModule() : SinglePortModule("detection", meshtastic_PortNum_DETECTION_SENSOR_APP), OSThread("DetectionSensor")
-    {
-    }
+    DetectionSensorModule();
+#ifdef MESHTASTIC_EXCLUDE_SCREEN
+    int handleInputEvent(const InputEvent *event);
+#endif
 
   protected:
     virtual int32_t runOnce() override;
@@ -18,6 +20,10 @@ class DetectionSensorModule : public SinglePortModule, private concurrency::OSTh
     void sendDetectionMessage();
     void sendCurrentStateMessage(bool state);
     bool hasDetectionEvent();
+#ifdef MESHTASTIC_EXCLUDE_SCREEN
+    CallbackObserver<DetectionSensorModule, const InputEvent *> inputObserver =
+        CallbackObserver<DetectionSensorModule, const InputEvent *>(this, &DetectionSensorModule::handleInputEvent);
+#endif
 };
 
 extern DetectionSensorModule *detectionSensorModule;
