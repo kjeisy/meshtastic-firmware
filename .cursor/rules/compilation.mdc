@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+The code is compiled with the following command:
+platformio run --environment <environment>
+
+The available environments are shown in the folder "boards/". `seeed-xiao-s3` is a good choice for development.
