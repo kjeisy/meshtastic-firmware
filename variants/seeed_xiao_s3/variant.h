@@ -88,4 +88,8 @@ L76K GPS Module Information : https://www.seeedstudio.com/L76K-GNSS-Module-for-S
 #define SX126X_RXEN 38
 #define SX126X_TXEN RADIOLIB_NC
 #define SX126X_DIO3_TCXO_VOLTAGE 1.8
+
+#define ANALOG_MOISTURE_SENSOR_ENABLED
+#define ANALOG_MOISTURE_PIN 1
+
 #endif

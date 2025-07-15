@@ -188,6 +188,12 @@ NullSensor pct2075Sensor;
 RCWL9620Sensor rcwl9620Sensor;
 CGRadSensSensor cgRadSens;
 
+// Analog Moisture Sensor
+#ifdef ANALOG_MOISTURE_SENSOR_ENABLED
+#include "Sensor/AnalogMoistureSensor.h"
+AnalogMoistureSensor analogMoistureSensor;
+#endif
+
 #endif
 #ifdef T1000X_SENSOR_EN
 #include "Sensor/T1000xSensor.h"
@@ -309,6 +315,10 @@ int32_t EnvironmentTelemetryModule::runOnce()
                 result = rak12035Sensor.runOnce();
             }
 #endif
+            // Initialize analog moisture sensor
+#ifdef ANALOG_MOISTURE_SENSOR_ENABLED
+            result = analogMoistureSensor.runOnce();
+#endif
 #endif
         }
         // it's possible to have this module enabled, only for displaying values on the screen.
@@ -385,7 +395,8 @@ void EnvironmentTelemetryModule::drawFrame(OLEDDisplay *display, OLEDDisplayUiSt
 
     // Check if any telemetry field has valid data
     bool hasAny = m.has_temperature || m.has_relative_humidity || m.barometric_pressure != 0 || m.iaq != 0 || m.voltage != 0 ||
-                  m.current != 0 || m.lux != 0 || m.white_lux != 0 || m.weight != 0 || m.distance != 0 || m.radiation != 0;
+                  m.current != 0 || m.lux != 0 || m.white_lux != 0 || m.weight != 0 || m.distance != 0 || m.radiation != 0 ||
+                  m.has_soil_moisture;
 
     if (!hasAny) {
         display->drawString(x, currentY, "No Telemetry");
@@ -472,6 +483,8 @@ void EnvironmentTelemetryModule::drawFrame(OLEDDisplay *display, OLEDDisplayUiSt
         entries.push_back("Level: " + String(m.distance, 0) + "mm");
     if (m.radiation != 0)
         entries.push_back("Rad: " + String(m.radiation, 2) + " µR/h");
+    if (m.has_soil_moisture)
+        entries.push_back("Soil: " + String(m.soil_moisture) + "%");
 
     // === Show first available metric on top-right of first line ===
     if (!entries.empty()) {
@@ -685,6 +698,11 @@ bool EnvironmentTelemetryModule::getEnvironmentTelemetry(meshtastic_Telemetry *m
         valid = valid && rak12035Sensor.getMetrics(m);
         hasSensor = true;
     }
+#endif
+    // Get analog moisture sensor data
+#ifdef ANALOG_MOISTURE_SENSOR_ENABLED
+    valid = valid && analogMoistureSensor.getMetrics(m);
+    hasSensor = true;
 #endif
 #endif
     return valid && hasSensor;

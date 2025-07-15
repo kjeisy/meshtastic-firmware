@@ -457,5 +457,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define HAS_SCREEN 0
 #endif
 
+// Analog Moisture Sensor Configuration
+// These macros can be overridden in variant.h before including configuration.h
+// default values taken from seeed wiki https://wiki.seeedstudio.com/Grove-Moisture_Sensor/
+// but x4 as the analog read is 12bit instead of 10bit
+#ifdef ANALOG_MOISTURE_SENSOR_ENABLED
+#ifndef ANALOG_MOISTURE_PIN
+#define ANALOG_MOISTURE_PIN 1 // Default analog pin (GPIO1 for XIAO ESP32S3)
+#endif
+#ifndef ANALOG_MOISTURE_DRY_VALUE
+#define ANALOG_MOISTURE_DRY_VALUE 300 * 4 // ADC value for dry soil
+#endif
+#ifndef ANALOG_MOISTURE_HUMID_VALUE
+#define ANALOG_MOISTURE_HUMID_VALUE 700 * 4 // ADC value for humid soil
+#endif
+#ifndef ANALOG_MOISTURE_WET_VALUE
+#define ANALOG_MOISTURE_WET_VALUE 950 * 4 // ADC value for wet soil
+#endif
+#ifndef ANALOG_MOISTURE_SAMPLES
+#define ANALOG_MOISTURE_SAMPLES 10 // Number of samples to average
+#endif
+#endif
+
 #include "DebugConfiguration.h"
 #include "RF95Configuration.h"
