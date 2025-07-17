@@ -3,7 +3,7 @@
  */
 #include "configuration.h"
 
-#if !MESHTASTIC_EXCLUDE_ENVIRONMENTAL_SENSOR
+#if !MESHTASTIC_EXCLUDE_ENVIRONMENTAL_SENSOR && ANALOG_MOISTURE_SENSOR_ENABLED
 
 #include "../mesh/generated/meshtastic/telemetry.pb.h"
 #include "AnalogMoistureSensor.h"
